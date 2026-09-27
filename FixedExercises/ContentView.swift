@@ -113,7 +113,7 @@ struct ContentView: View {
             alertTitle,
             isPresented: $alertActive) {
                 Button("OK", role: .cancel) {
-                    isLoading = false
+                    
                 }
             } message: {
                 Text(alertContent)
@@ -148,6 +148,7 @@ struct ContentView: View {
                 alertTitle = "Error"
                 alertContent = "Wrong Email and/or Password"
             }
+            isLoading = false
             alertActive = true
         }
     }
