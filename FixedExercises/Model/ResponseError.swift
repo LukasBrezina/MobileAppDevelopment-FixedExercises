@@ -23,7 +23,8 @@ nonisolated struct ResponseError: Codable {
 nonisolated struct InlineError: Codable {
     let code: Int
     let message: String
-    let errors: [Errors]
+    let errors: [Errors]?
+    let status: String?
 }
 
 nonisolated struct Errors: Codable {

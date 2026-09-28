@@ -26,6 +26,9 @@ struct LoginView: View {
     @State
     private var isLoading = false
     
+    @State
+    private var loginSuccess = false
+    
     private let minHeight: CGFloat = 40
     
     private let apiClient = APIClient()
@@ -37,6 +40,9 @@ struct LoginView: View {
     
     @FocusState
     private var focusedField: Field?
+    
+    @State
+    var user: User?
     
 
     var body: some View {
@@ -116,6 +122,9 @@ struct LoginView: View {
             } message: {
                 Text(alertContent)
             }
+            .navigationDestination(isPresented: $loginSuccess, destination: {
+                CountriesView(loginIdToken: user?.idToken ?? "")
+            })
     }
     
     func login() {
@@ -137,16 +146,17 @@ struct LoginView: View {
         isLoading = true
         focusedField = nil
         
-        apiClient.login(username: email, password: password) { user, error in
+        APIClient.shared.login(username: email, password: password) { user, error in
             isLoading = false
             if let error {
                 alertTitle = "Error"
                 alertContent = errorMessage(error: error)
+                loginSuccess = false
+                alertActive = true
             } else if user != nil {
-                alertTitle = "Success"
-                alertContent = "Successful Login"
+                self.user = user
+                loginSuccess = true
             }
-            alertActive = true
         }
     }
     
