@@ -6,13 +6,14 @@
 //
 
 enum NetworkError: Error {
+    case internalServerError
     case serializationError
     case invalidEmail
     case wrongEmail
     case invalidCredentials
     case invalidApiUrl
-    case noNetworkConnection
-    case unexpectedHttpFormat
-    case internalServerError
-    case unexpectedError
+    case noNetworkConnection(String)
+    case unexpectedHttpFormat(Int)
+    case httpError(statusCode: Int, message: String?)
+    case unexpectedError(String)
 }

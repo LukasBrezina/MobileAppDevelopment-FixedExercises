@@ -9,14 +9,14 @@ import Foundation
 nonisolated struct ResponseError: Codable {
     let error: InlineError
     
-    func getNetworkError() -> NetworkError {
-            switch error.message {
-            case "INVALID_EMAIL": return .invalidEmail
-            case "EMAIL_NOT_FOUND": return .wrongEmail
-            case "INVALID_PASSWORD", "INVALID_LOGIN_CREDENTIALS": return .invalidCredentials
-            default: return .unexpectedError
-            }
+    func getNetworkError(statusCode: Int) -> NetworkError {
+        switch error.message {
+        case "INVALID_EMAIL": return .invalidEmail
+        case "EMAIL_NOT_FOUND": return .wrongEmail
+        case "INVALID_PASSWORD", "INVALID_LOGIN_CREDENTIALS": return .invalidCredentials
+        default: return .httpError(statusCode: statusCode, message: error.message)
         }
+    }
     
 }
 
