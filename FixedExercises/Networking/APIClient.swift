@@ -10,17 +10,23 @@ import Foundation
 class APIClient {
     
     private let session = URLSession(configuration: .default)
-    private let apiKey = ""
+    private let apiKey = "AIzaSyDeLs8S6Hpy642JUPC3Pft-xVx8Ocs-uXY"
+    private var apiUrl: String {
+        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=\(apiKey)"
+    }
     
     func login(username: String,
                password: String,
                completionHandler: @escaping (User?, NetworkError?) -> Void) {
         
-        guard let url = URL(string: "") else { return }
+        guard let url = URL(string: apiUrl) else {
+            completionHandler(nil, .invalidApiUrl)
+            return
+        }
         
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.addValue("application/json", forHTTPHeaderField: "Content/Type")
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         
         let body: [String: Any] = [
             "email" : username,
@@ -28,29 +34,36 @@ class APIClient {
             "returnSecureToken": true
         ]
         
-        let data = try! JSONSerialization.data(withJSONObject: body)
-        
-        request.httpBody = data
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        } catch {
+            completionHandler(nil, .serializationError)
+            return
+        }
         
         let dataTask = session.dataTask(with: request) { data, urlResponse, error in
-        
-            if let data {
-                if let response = urlResponse as? HTTPURLResponse, response.statusCode != 200 {
-                    DispatchQueue.main.async {
-                        let error: ResponseError = try! JSONDecoder().decode(ResponseError.self, from: data)
-                        
-                        completionHandler(nil, error.getNetworkError())
-                        
-                    }
-                } else {
-                    DispatchQueue.main.async {
-                        let user: User = try! JSONDecoder().decode(User.self, from: data)
-                        
-                        completionHandler(user, nil)
-                    }
-                }
-            }
+            var user: User?
+            var networkError: NetworkError?
             
+            if error != nil {
+                 networkError = .noNetworkConnection
+             } else if let data, let http = urlResponse as? HTTPURLResponse {
+                 if http.statusCode == 200 {
+                     user = try? JSONDecoder().decode(User.self, from: data)
+                     print (user!)
+                     if user == nil { networkError = .unexpectedHttpFormat }
+                 } else if let responseError = try? JSONDecoder().decode(ResponseError.self, from: data) {
+                     networkError = responseError.getNetworkError()
+                 } else {
+                     networkError = .internalServerError
+                 }
+             } else {
+                 networkError = .unexpectedError
+             }
+            
+            DispatchQueue.main.async {
+                completionHandler(user, networkError)
+            }
         }
         
         dataTask.resume()

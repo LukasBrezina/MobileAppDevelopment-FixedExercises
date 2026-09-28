@@ -5,7 +5,7 @@
 //  Created by Lukas Brezina on 21.09.26.
 //
 
-struct User: Codable {
+nonisolated struct User: Codable {
     let kind: String
     let localId: String
     let email: String

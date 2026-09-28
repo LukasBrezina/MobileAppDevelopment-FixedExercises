@@ -10,6 +10,7 @@ enum NetworkError: Error {
     case invalidEmail
     case wrongEmail
     case invalidCredentials
+    case invalidApiUrl
     case noNetworkConnection
     case unexpectedHttpFormat
     case internalServerError

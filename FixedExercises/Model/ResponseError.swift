@@ -4,42 +4,31 @@
 //
 //  Created by Lukas Brezina on 21.09.26.
 //
+import Foundation
 
-struct ResponseError: Decodable {
-    
-    struct InlineError: Decodable {
-        
-        struct Errors: Decodable {
-            // TODO: add fields
-        }
-        
-        let code: Int
-        let message: String
-        let errors: [Errors]
-        
-        init(code: Int, message: String, errors: [Errors]) {
-            self.code = code
-            self.message = message
-            self.errors = errors
-        }
-        
-    }
-    
+nonisolated struct ResponseError: Codable {
     let error: InlineError
     
-    init(error: InlineError) {
-        self.error = error
-    }
-
     func getNetworkError() -> NetworkError {
-        switch error.message {
-            case "INVALID_LOGIN_CREDENTIALS":
-                return .invalidCredentials
-            case "INVALID_EMAIL":
-                return .invalidEmail
-            default:
-                return .unexpectedError
+            switch error.message {
+            case "INVALID_EMAIL": return .invalidEmail
+            case "EMAIL_NOT_FOUND": return .wrongEmail
+            case "INVALID_PASSWORD", "INVALID_LOGIN_CREDENTIALS": return .invalidCredentials
+            default: return .unexpectedError
             }
-        // TODO: other errors
-    }
+        }
+    
 }
+
+nonisolated struct InlineError: Codable {
+    let code: Int
+    let message: String
+    let errors: [Errors]
+}
+
+nonisolated struct Errors: Codable {
+    let message: String
+    let domain: String
+    let reason: String
+}
+

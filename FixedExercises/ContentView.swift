@@ -8,15 +8,12 @@
 import SwiftUI
 
 struct ContentView: View {
-    
-    private let expectedEmail = "hcw@test.com"
-    private let expectedPassword = "hcwPass123"
 
     @State
-    private var email = ""
+    private var email = "mad-fe@mad.at"
     
     @State
-    private var password = ""
+    private var password = "madmad"
     
     @State
     private var alertTitle = ""
@@ -31,6 +28,8 @@ struct ContentView: View {
     private var isLoading = false
     
     private let minHeight: CGFloat = 40
+    
+    private let apiClient = APIClient()
     
     private enum Field {
         case email
@@ -139,17 +138,29 @@ struct ContentView: View {
         isLoading = true
         focusedField = nil
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            
-            if (email == expectedEmail && password == expectedPassword) {
+        apiClient.login(username: email, password: password) { user, error in
+            isLoading = false
+            if let error {
+                alertTitle = "Error"
+                alertContent = errorMessage(error: error)
+            } else if user != nil {
                 alertTitle = "Success"
                 alertContent = "Successful Login"
-            } else {
-                alertTitle = "Error"
-                alertContent = "Wrong Email and/or Password"
             }
-            isLoading = false
             alertActive = true
+        }
+    }
+    
+    private func errorMessage(error: NetworkError) -> String {
+        
+        switch error {
+        case .internalServerError: return "Internal Server Error"
+        case .invalidApiUrl: return "Invalid API URL"
+        case .invalidCredentials: return "Invalid Credentials"
+        case .invalidEmail: return "Invalid Email"
+        case .noNetworkConnection: return "No Network Connection"
+        case .serializationError: return "Serialization Error"
+        default: return "Unexpected Error"
         }
     }
 }
