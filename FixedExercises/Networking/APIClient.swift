@@ -50,7 +50,6 @@ class APIClient {
              } else if let data, let http = urlResponse as? HTTPURLResponse {
                  if http.statusCode == 200 {
                      user = try? JSONDecoder().decode(User.self, from: data)
-                     print (user!)
                      if user == nil { networkError = .unexpectedHttpFormat }
                  } else if let responseError = try? JSONDecoder().decode(ResponseError.self, from: data) {
                      networkError = responseError.getNetworkError()
