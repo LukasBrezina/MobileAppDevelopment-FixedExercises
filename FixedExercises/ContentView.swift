@@ -43,82 +43,77 @@ struct ContentView: View {
 
     var body: some View {
         
-        HStack {
-            VStack {
+        VStack {
                 
-                Spacer()
-                
-                Text("Login")
-                    .font(.largeTitle)
-                    .frame(maxWidth: .infinity, minHeight: minHeight)
-                    .padding(24)
-                    .bold()
-                
-                
-                TextField("Email", text: $email)
-                    .textInputAutocapitalization(.never)
-                    .textContentType(.emailAddress)
-                    .keyboardType(.emailAddress)
-                    .focused($focusedField, equals: .email)
-                    .submitLabel(.next)
-                    .autocorrectionDisabled()
-                    .frame(maxWidth: .infinity, minHeight: minHeight)
-                    .font(.title2)
-                    .padding()
-                    .background(Color.gray.opacity(0.3))
-                    .cornerRadius(10)
-                    .onSubmit {
-                        focusedField = .password
-                    }
-                
-                SecureField("Password", text: $password)
-                    .textContentType(.password)
-                    .focused($focusedField, equals: .password)
-                    .submitLabel(.go)
-                    .frame(maxWidth: .infinity, minHeight: minHeight)
-                    .font(.title2)
-                    .padding()
-                    .background(Color.gray.opacity(0.3))
-                    .cornerRadius(10)
-                    .onSubmit {
-                        login()
-                    }
-                
-                Spacer()
-                
-                HStack {
-                    if isLoading {
-                        ProgressView()
-                            .progressViewStyle(.circular)
-                            .frame(maxWidth: .infinity, minHeight: minHeight)
-                            .padding()
-                    } else {
-                        Button {
-                            login()
-                        } label: {
-                            Text("Login")
-                                .font(.title)
-                                .bold()
-                                .foregroundColor(.white)
-                                .frame(maxWidth: .infinity, minHeight: minHeight)
-                                .padding()
-                                .background(Color.blue)
-                                .cornerRadius(10)
-                        }
-                    }
+            Spacer()
+            
+            Text("Login")
+                .font(.largeTitle)
+                .frame(maxWidth: .infinity, minHeight: minHeight)
+                .padding(24)
+                .bold()
+            
+            
+            TextField("Email", text: $email)
+                .textInputAutocapitalization(.never)
+                .textContentType(.emailAddress)
+                .keyboardType(.emailAddress)
+                .focused($focusedField, equals: .email)
+                .submitLabel(.next)
+                .autocorrectionDisabled()
+                .frame(maxWidth: .infinity, minHeight: minHeight)
+                .font(.title2)
+                .padding()
+                .background(Color.gray.opacity(0.3))
+                .cornerRadius(10)
+                .onSubmit {
+                    focusedField = .password
                 }
-                
-                
-                Spacer()
+            
+            SecureField("Password", text: $password)
+                .textContentType(.password)
+                .focused($focusedField, equals: .password)
+                .submitLabel(.go)
+                .frame(maxWidth: .infinity, minHeight: minHeight)
+                .font(.title2)
+                .padding()
+                .background(Color.gray.opacity(0.3))
+                .cornerRadius(10)
+                .onSubmit {
+                    login()
+                }
+            
+            Spacer()
+            
+            if isLoading {
+                ProgressView()
+                    .progressViewStyle(.circular)
+                    .frame(maxWidth: .infinity, minHeight: minHeight)
+                    .padding()
+            } else {
+                Button {
+                    login()
+                } label: {
+                    Text("Login")
+                        .font(.title)
+                        .bold()
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity, minHeight: minHeight)
+                        .padding()
+                        .background(Color.blue)
+                        .cornerRadius(10)
+                }
             }
-            .disabled(isLoading)
-            .padding()
+            
+            Spacer()
         }
+        .disabled(isLoading)
+        .padding()
         .alert(
             alertTitle,
             isPresented: $alertActive) {
                 Button("OK", role: .cancel) {
-                    isLoading = false
+                    
                 }
             } message: {
                 Text(alertContent)
@@ -153,6 +148,7 @@ struct ContentView: View {
                 alertTitle = "Error"
                 alertContent = "Wrong Email and/or Password"
             }
+            isLoading = false
             alertActive = true
         }
     }
