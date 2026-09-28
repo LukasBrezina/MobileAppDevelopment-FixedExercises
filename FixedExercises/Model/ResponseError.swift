@@ -6,7 +6,7 @@
 //
 import Foundation
 
-nonisolated struct ResponseError: Codable {
+struct ResponseError: Codable {
     let error: InlineError
     
     func getNetworkError(statusCode: Int) -> NetworkError {
@@ -20,13 +20,13 @@ nonisolated struct ResponseError: Codable {
     
 }
 
-nonisolated struct InlineError: Codable {
+struct InlineError: Codable {
     let code: Int
     let message: String
     let errors: [Errors]
 }
 
-nonisolated struct Errors: Codable {
+struct Errors: Codable {
     let message: String
     let domain: String
     let reason: String
