@@ -152,15 +152,17 @@ struct ContentView: View {
     }
     
     private func errorMessage(error: NetworkError) -> String {
-        
         switch error {
-        case .internalServerError: return "Internal Server Error"
-        case .invalidApiUrl: return "Invalid API URL"
-        case .invalidCredentials: return "Invalid Credentials"
-        case .invalidEmail: return "Invalid Email"
-        case .noNetworkConnection: return "No Network Connection"
-        case .serializationError: return "Serialization Error"
-        default: return "Unexpected Error"
+        case .internalServerError: "Internal Server Error"
+        case .serializationError: "Serialization Error"
+        case .invalidEmail: "Invalid Email"
+        case .wrongEmail: "No account found for this email"
+        case .invalidCredentials: "Invalid Credentials"
+        case .invalidApiUrl: "Invalid API URL"
+        case .noNetworkConnection(let text): "No Network Connection: \(text)"
+        case .unexpectedHttpFormat(let code): "Unexpected response format (status \(code))"
+        case .httpError(let code, let message): "Request failed (status \(code)): \(message ?? "unknown")"
+        case .unexpectedError(let text): "Unexpected Error: \(text)"
         }
     }
 }

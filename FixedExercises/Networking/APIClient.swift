@@ -44,27 +44,26 @@ class APIClient {
         let dataTask = session.dataTask(with: request) { data, urlResponse, error in
             var user: User?
             var networkError: NetworkError?
-            
-            if error != nil {
-                 networkError = .noNetworkConnection
-             } else if let data, let http = urlResponse as? HTTPURLResponse {
-                 if http.statusCode == 200 {
-                     user = try? JSONDecoder().decode(User.self, from: data)
-                     if user == nil { networkError = .unexpectedHttpFormat }
-                 } else if let responseError = try? JSONDecoder().decode(ResponseError.self, from: data) {
-                     networkError = responseError.getNetworkError()
-                 } else {
-                     networkError = .internalServerError
-                 }
-             } else {
-                 networkError = .unexpectedError
-             }
-            
+
+            if let error {
+                networkError = .noNetworkConnection(error.localizedDescription)
+            } else if let data, let http = urlResponse as? HTTPURLResponse {
+                if (200...299).contains(http.statusCode) {
+                    user = try? JSONDecoder().decode(User.self, from: data)
+                    if user == nil { networkError = .unexpectedHttpFormat(http.statusCode) }
+                } else if let responseError = try? JSONDecoder().decode(ResponseError.self, from: data) {
+                    networkError = responseError.getNetworkError(statusCode: http.statusCode)
+                } else {
+                    networkError = .httpError(statusCode: http.statusCode, message: nil)
+                }
+            } else {
+                networkError = .unexpectedError("No data or response")
+            }
+
             DispatchQueue.main.async {
                 completionHandler(user, networkError)
             }
         }
-        
         dataTask.resume()
         
     }
